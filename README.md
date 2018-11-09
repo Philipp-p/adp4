@@ -2,6 +2,7 @@
 
 ### Execution
 folow first 2 steps https://kafka.apache.org/quickstart
+*but map kafka to 9093 to avoid conflict*
 
 but in step 3:
 ```

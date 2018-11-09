@@ -27,13 +27,13 @@ public class Producer implements Runnable{
         this.props = props;
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
         final int numValues = 100;
         final String topic = "sensor";
 
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9093");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
@@ -48,7 +48,7 @@ public class Producer implements Runnable{
         executor.shutdown();
 
         try {
-            if (!executor.awaitTermination(100000, TimeUnit.MILLISECONDS)) {
+            if (!executor.awaitTermination(10000, TimeUnit.MILLISECONDS)) {
                 executor.shutdownNow();
             }
         } catch (InterruptedException e) {
