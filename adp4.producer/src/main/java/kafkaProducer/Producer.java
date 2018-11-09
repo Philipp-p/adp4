@@ -13,11 +13,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class Producer implements Runnable{
-    int id;
-    int numValues;
-    String topic;
-    int partition;
-    Properties props;
+    private int id;
+    private int numValues;
+    private String topic;
+    private int partition;
+    private Properties props;
 
     public Producer(int id, int numValues, String topic, int partition, Properties props) {
         this.id = id;
@@ -54,6 +54,8 @@ public class Producer implements Runnable{
         } catch (InterruptedException e) {
             executor.shutdownNow();
         }
+
+        System.out.println("Producer is done");
 
     }
 
