@@ -14,10 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class Consumer implements Runnable{
-    int id;
-    String topic;
-    int numOfPolls;
-    Properties props;
+    private int id;
+    private String topic;
+    private int numOfPolls;
+    private Properties props;
 
     public Consumer(int id, String topic, int numOfPolls, Properties props) {
         this.id = id;
@@ -27,6 +27,7 @@ public class Consumer implements Runnable{
     }
 
     public static void main(String[] args) {
+        System.out.println("Booting up consumers");
         String topic = "sensor";
         int numOfPolls = 100;
 
@@ -38,45 +39,47 @@ public class Consumer implements Runnable{
 
         Consumer c1 = new Consumer(0, topic, numOfPolls / 2 , props);
         Consumer c2 = new Consumer(1, topic, numOfPolls / 2 , props);
-
         ExecutorService executor = Executors.newCachedThreadPool();
 
         executor.submit(c1);
         executor.submit(c2);
 
         executor.shutdown();
-
         try {
             if (!executor.awaitTermination(10000, TimeUnit.MILLISECONDS)) {
                 executor.shutdownNow();
             }
         } catch (InterruptedException e) {
+            e.printStackTrace();
             executor.shutdownNow();
         }
 
+        System.out.println("Shutdown consumers complete");
+
     }
 
-    private static void consume(int id ,String topic, int numOfPolls, Properties props) throws InterruptedException {
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
+    private static void consume(int id ,String topic, int numOfPolls, Properties props) {
+        //line below is problem with gradel possible classdefnotfound error, gradle issue…
+        //fixed with shadow plugin
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
         consumer.subscribe(Collections.singletonList(topic));
 
         for (int i = 0; i < numOfPolls; ++i){
             ConsumerRecords<String, String> recs = consumer.poll(Duration.of(10, ChronoUnit.SECONDS));
             if (recs.count() != 0) {
                 for (ConsumerRecord<String, String> rec : recs) {
-                    System.out.printf("Consumer: %d Recieved %s %s\n", id, rec.key(), rec.value());
+                    System.out.println("Consumer: " + id + " Recieved " + rec.key() + " " + rec.value());
                 }
             }
         }
+
     }
 
     @Override
     public void run() {
-        try {
-            consume(id, topic, numOfPolls, props);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        System.out.println(id + " begin");
+        consume(id, topic, numOfPolls, props);
+        System.out.println(id + " done");
     }
 }
 
